@@ -3,7 +3,7 @@ from textwrap import dedent
 
 # brian 2
 from brian2 import NeuronGroup, Synapses, PoissonInput, SpikeMonitor, Network
-from brian2 import mV, ms, Hz, Mohm, uF
+from brian2 import mV, ms, Hz
 
 # file handling
 from pathlib import Path
@@ -42,7 +42,7 @@ default_params = {
 
     # equations for neurons               # alpha synapse https://doi.org/10.1017/CBO9780511815706
     'eqs'       : dedent(''' 
-                    dv/dt = (v_0 - v + g)) / t_mbr : volt (unless refractory)
+                    dv/dt = (v_0 - v + g) / t_mbr : volt (unless refractory)
                     dg/dt = -g / tau               : volt (unless refractory) 
                     rfc                            : second
                     '''),
