@@ -1,5 +1,4 @@
 import pandas as pd
-from utils import useful_mappings
 from textwrap import dedent
 
 # brian 2
@@ -7,7 +6,6 @@ from brian2 import NeuronGroup, Synapses, PoissonInput, SpikeMonitor, Network
 from brian2 import mV, ms, Hz, Mohm, uF
 
 # file handling
-import pickle
 from pathlib import Path
 
 # parallelization
@@ -25,7 +23,7 @@ default_params = {
     'v_0'       : -52 * mV,               # resting potential
     'v_rst'     : -52 * mV,               # reset potential after spike
     'v_th'      : -45 * mV,               # threshold for spiking
-    't_mbr'     : .002 * uF * 10. * Mohm, # membrane time scale (capacitance * resistance)
+    't_mbr'     :  20 * ms,               # membrane time scale (capacitance * resistance = .002 * uF * 10. * Mohm)
 
     # Jürgensen et al https://doi.org/10.1088/2634-4386/ac3ba6
     'tau'       : 5 * ms,                 # time constant (this is the excitatory one, the inhibitory is 10 ms)
@@ -42,16 +40,16 @@ default_params = {
     'r_poi'     : 150*Hz,                 # default rate of the Poisson input
     'f_poi'     : 250,                    # scaling factor for Poisson synapse
 
-    # equations for neurons
-    'eqs'       : dedent('''
-                    dv/dt = (x - (v - v_0)) / t_mbr : volt (unless refractory)
-                    dx/dt = -x / tau                : volt (unless refractory) 
-                    rfc                             : second
+    # equations for neurons               # alpha synapse https://doi.org/10.1017/CBO9780511815706
+    'eqs'       : dedent(''' 
+                    dv/dt = (v_0 - v + g)) / t_mbr : volt (unless refractory)
+                    dg/dt = -g / tau               : volt (unless refractory) 
+                    rfc                            : second
                     '''),
     # condition for spike
     'eq_th'     : 'v > v_th', 
     # rules for spike        
-    'eq_rst'    : 'v = v_rst; w = 0; x = 0 * mV', 
+    'eq_rst'    : 'v = v_rst; w = 0; g = 0 * mV', 
 }
 
 
@@ -159,11 +157,11 @@ def create_model(path_comp, path_con, params):
         namespace=params,
     )
     neu.v = params['v_0'] # initialize values
-    neu.x = 0
+    neu.g = 0
     neu.rfc = params['t_rfc']
 
     # create synapses
-    syn = Synapses(neu, neu, 'w : volt', on_pre='x += w', delay=params['t_dly'], name='default_synapses')
+    syn = Synapses(neu, neu, 'w : volt', on_pre='g += w', delay=params['t_dly'], name='default_synapses')
 
     # connect synapses
     i_pre = df_con.loc[:, 'Presynaptic_Index'].values
@@ -202,7 +200,7 @@ def get_spk_trn(spk_mon):
     
     return spk_trn
 
-def construct_dataframe(res, exp_name, exc, i2flyid):
+def construct_dataframe(res, exp_name, i2flyid):
     '''Take spike time dict and colltect spikes in pandas dataframe
 
     Parameters
@@ -211,8 +209,6 @@ def construct_dataframe(res, exp_name, exc, i2flyid):
         List with spike time dicts for each trial
     exp_name : str
         Name of the experiment
-    exc : list
-        List with indices for excited neurons
     i2flyid : dict
         Mapping between Brian IDs and flywire IDs
 
@@ -284,7 +280,7 @@ def run_trial(exc, slnc, path_comp, path_con, params):
     return spk_trn
 
 
-def run_exp(exp_name, neu_exc, path_res, path_comp, path_con, params=default_params, neu_slnc=[], name2flyid=dict(), n_proc=-1):
+def run_exp(exp_name, neu_exc, path_res, path_comp, path_con, params=default_params, neu_slnc=[], n_proc=-1):
     '''
     Run default network experiment 
     Neurons in `neu_exc` are Poisson external inputs
@@ -307,8 +303,6 @@ def run_exp(exp_name, neu_exc, path_res, path_comp, path_con, params=default_par
             Constants and equations that are used to construct the brian2 network model
         neu_exc: list (optional)
             contains custom names or flywire IDs of neurons to be excited
-        name2flyid : dict (optional)
-            Mapping between custom neuron names and flywire IDs
         n_proc: int (optional)
             number of cores to be used for parallel runs
             default: -1 (use all available cores)
@@ -319,7 +313,9 @@ def run_exp(exp_name, neu_exc, path_res, path_comp, path_con, params=default_par
     path_res, path_comp, path_con = [ Path(i) for i in [path_res, path_comp, path_con] ]
 
     # load name/id mappings
-    flyid2name, _, i2flyid, _, _, name_flyid2i = useful_mappings(name2flyid, path_comp)
+    df_comp = pd.read_csv(path_comp, index_col=0) # load completeness dataframe
+    flyid2i = {j: i for i, j in enumerate(df_comp.index)}  # flywire id: biran ID
+    i2flyid = {j: i for i, j in flyid2i.items()} # brian ID: flywire ID
     
     # define output files
     path_save = path_res / '{}.parquet'.format(exp_name)
@@ -327,16 +323,16 @@ def run_exp(exp_name, neu_exc, path_res, path_comp, path_con, params=default_par
     # print info
     print('>>> Experiment:     {}'.format(exp_name))
     print('    Output file:    {}'.format(path_save))
-    print('    Exited neurons: {}'.format(' '.join([str(i) for i in neu_exc])))
+    print('    Exited neurons: {}'.format(len(neu_exc)))
     if neu_slnc:
-        print('    Silenced neurons: {}'.format(' '.join([str(i) for i in neu_slnc])))
+        print('    Silenced neurons: {}'.format(len(neu_slnc)))
     
     # start parallel calculation
     n_run = params['n_run']
     start = time() 
     with parallel_backend('loky', n_jobs=n_proc):
-        exc = [ name_flyid2i[n] for n in neu_exc ]
-        slnc = [ name_flyid2i[n] for n in neu_slnc ]
+        exc = [ flyid2i[n] for n in neu_exc ]
+        slnc = [ flyid2i[n] for n in neu_slnc ]
         res = Parallel()(
             delayed(
                 run_trial)(exc, slnc, path_comp, path_con, params) for _ in range(n_run))
@@ -347,8 +343,7 @@ def run_exp(exp_name, neu_exc, path_res, path_comp, path_con, params=default_par
     print('    Elapsed time:   {} s'.format(int(walltime)))
 
     # dataframe with spike times
-    df = construct_dataframe(res, exp_name, exc, i2flyid)
-    df.loc[:, 'name'] = df.loc[:, 'flywire_id'].map(flyid2name).fillna('')
+    df = construct_dataframe(res, exp_name, i2flyid)
 
     # store spike data
     df.to_parquet(path_save, compression='brotli')

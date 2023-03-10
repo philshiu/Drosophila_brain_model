@@ -1,49 +1,6 @@
 import pandas as pd
 import numpy as np
 
-import pickle
-
-def useful_mappings(name2flyid, path_comp):
-    '''Generate other useful mappings between custom names, flywire IDs
-    and canonical IDs (starting with 0, will be equivalent to brian neuron IDs)
-
-    Parameters
-    ----------
-    name2flyid : dict
-        Mapping between custom neuron names and flywire IDs
-    path_comp : str
-        Path to completeness dataframe
-
-    Returns
-    -------
-    flyid2name : dict
-        Inverted name2flyid dictionary
-    flyid2i : dict
-        Mapping between flywire IDs and canonical IDs
-    i2flyid : dict
-        Inverted flyid2i dictionary
-    name2i : dict
-        Mapping between custom neuron names and canonical IDs
-    i2name : dict
-        Inverted name2s dictionary
-    name_flyid2i : dict
-        Mapping of custom neuron names and flywire IDs to canonical IDs
-    '''
-
-    flyid2name = { j: i for i, j in name2flyid.items() } # flywire ID: custom name
-
-    df_comp = pd.read_csv(path_comp, index_col=0) # load completeness dataframe
-
-    flyid2i = {j: i for i, j in enumerate(df_comp.index)}  # flywire id: biran ID
-    i2flyid = {j: i for i, j in flyid2i.items()} # brian ID: flywire ID
-
-    name2i = {i: flyid2i[j] for i, j in name2flyid.items() } # custom name: brian ID
-    i2name = {j: i for i, j in name2i.items() } # brian ID: custom name
-
-    name_flyid2i = name2i | flyid2i # union of dicts
-
-    return flyid2name, flyid2i, i2flyid, name2i, i2name, name_flyid2i
-
 ##########
 # analysis
 def load_exps(l_pqt):
@@ -72,7 +29,7 @@ def load_exps(l_pqt):
 
     return df
 
-def get_rate(df, duration):
+def get_rate(df, duration, flyid2name=dict()):
     '''Calculate rate and standard deviation for all experiments
     in df
 
@@ -82,6 +39,8 @@ def get_rate(df, duration):
         Dataframe generated with `load_exps` containing spike times
     duration : float
         Trial duration in seconds
+    flyid2name : dict (optional)
+        Mapping between flywire IDs and custom names
 
     Returns
     -------
@@ -116,35 +75,9 @@ def get_rate(df, duration):
     
     df_rate = df.pivot_table(columns='exp_name', index='flyid', values='r')
     df_std = df.pivot_table(columns='exp_name', index='flyid', values='std')
+    
+    if flyid2name:
+        df_rate.insert(loc=0, column='name', value=df_rate.index.map(flyid2name).fillna(''))
+        df_std.insert(loc=0, column='name', value=df_rate.index.map(flyid2name).fillna(''))
 
     return df_rate, df_std
-
-def rename_index(df, name2flyid):
-    '''Rename flywire IDs to custom neuron names in index
-    Also sort index and columns
-
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Dataframe with flywire IDs as index
-    name2flyid : dict
-        Mapping between custom neuron names and flywire IDs
-
-    Returns
-    -------
-    df : pd.DataFrame
-        Renamed and sorted dataframe
-    '''
-
-    # replace flywire IDs with custom names
-    flyid2name = {v: k for k, v in name2flyid.items()}
-    df = df.rename(index=flyid2name)
-
-    # sort: str first (i.e. custom names), then int (i.e. flywire IDs)
-    df.index = df.index.astype(str)
-    df = df.loc[
-        sorted(sorted(df.index.astype(str)), key=lambda x: (x[0].isdigit(), x)), 
-        sorted(df.columns.sort_values(), key=lambda x: len(x.split('+')))
-        ]
-    
-    return df
