@@ -19,29 +19,28 @@ default_params = {
 
     # network constants
     # Kakaria and de Bivort 2017 https://doi.org/10.3389/fnbeh.2017.00008
-    # refereneces therein, e.g. Hodgkin and Huxley 1952
     'v_0'       : -52 * mV,               # resting potential
     'v_rst'     : -52 * mV,               # reset potential after spike
     'v_th'      : -45 * mV,               # threshold for spiking
     't_mbr'     :  20 * ms,               # membrane time scale (capacitance * resistance = .002 * uF * 10. * Mohm)
 
     # Jürgensen et al https://doi.org/10.1088/2634-4386/ac3ba6
-    'tau'       : 5 * ms,                 # time constant (this is the excitatory one, the inhibitory is 10 ms)
+    'tau'       : 5 * ms,                 # time constant 
 
-    # Lazar et at https://doi.org/10.7554/eLife.62362
-    # they cite Kakaria and de Bivort 2017, but those have used 2 ms
+    # Lazar et al https://doi.org/10.7554/eLife.62362
     't_rfc'     : 2.2 * ms,               # refractory period
 
     # Paul et al 2015 doi: 10.3389/fncel.2015.00029
     't_dly'     : 1.8*ms,                 # delay for changes in post-synaptic neuron
 
-    # empirical 
+    # Free parameter 
     'w_syn'     : .275 * mV,              # weight per synapse (note: modulated by exponential decay)
+    # Default activation rates 
     'r_poi'     : 150*Hz,                 # default rate of the Poisson inputs
     'r_poi2'    :   0*Hz,                 # default rate of a 2nd class of Poisson inputs
-    'f_poi'     : 250,                    # scaling factor for Poisson synapse
+    'f_poi'     : 250,                    # scaling factor for Poisson synapse; 250 is sufficient to cause spiking
 
-    # equations for neurons               # alpha synapse https://doi.org/10.1017/CBO9780511815706
+    # equations for neurons               # alpha synapse https://doi.org/10.1017/CBO9780511815706; See https://brian2.readthedocs.io/en/stable/user/converting_from_integrated_form.html
     'eqs'       : dedent(''' 
                     dv/dt = (v_0 - v + g) / t_mbr : volt (unless refractory)
                     dg/dt = -g / tau               : volt (unless refractory) 
@@ -195,7 +194,7 @@ def get_spk_trn(spk_mon):
 
     The spike times recorded in the SpikeMonitor object during 
     simulation are converted to a list of times for each neurons.
-    Returns dict wich "brian ID": "list of spike times".
+    Returns dict with "brian ID": "list of spike times".
 
     Parameters
     ----------
@@ -213,7 +212,7 @@ def get_spk_trn(spk_mon):
     return spk_trn
 
 def construct_dataframe(res, exp_name, i2flyid):
-    '''Take spike time dict and colltect spikes in pandas dataframe
+    '''Take spike time dict and collects spikes in pandas dataframe
 
     Parameters
     ----------
@@ -347,7 +346,7 @@ def run_exp(exp_name, neu_exc, path_res, path_comp, path_con,
     # print info
     print('>>> Experiment:     {}'.format(exp_name))
     print('    Output file:    {}'.format(path_save))
-    print('    Exited neurons: {}'.format(len(neu_exc + neu_exc2)))
+    print('    Excited neurons: {}'.format(len(neu_exc + neu_exc2)))
     if neu_slnc:
         print('    Silenced neurons: {}'.format(len(neu_slnc)))
     
