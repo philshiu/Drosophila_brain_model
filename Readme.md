@@ -1,8 +1,52 @@
 # Model for the _Drosophila_ brain
-This repository accompanies the paper [A leaky integrate-and-fire computational model based on the connectome of the entire adult Drosophila brain reveals insights into sensorimotor processing](https://www.biorxiv.org/content/10.1101/2023.05.02.539144v1).
+Activate and silence neurons in a computational model based on the
+fruit fly connectome
+
+# Paper
+This repository accompanies the paper 
+[A leaky integrate-and-fire computational model based on the connectome of the entire adult Drosophila brain reveals insights into sensorimotor processing](https://www.biorxiv.org/content/10.1101/2023.05.02.539144v1).
+It includes all code necessary to reproduce the data presented there.
+[figures.ipynb](figures.ipynb) contains the code used to perfrom the calculations.
+However, the raw output of the model is several GB and therefore not posted on github.
+Instead, it can be found in this [online archive](TODO).
 
 
-In this model, one can activate a set of [Flywire](https://flywire.ai/) neurons at a particular frequency, then identify what neurons respond to this activation. Additionally, two sets of neurons (e.g., sugar and bitter sensing neurons) can be activated, and the interactions between these two neurons can be determined. Furthermore, one can also activate a set of neurons and silence a second set of neurons, and measure how this changes activity of a set of output neurons.
 
 
-See the [example](https://github.com/philshiu/Drosophila_brain_model/blob/main/example.ipynb) file for details on how to perform these operations.
+# Usage
+With this computational model,
+one can manipulate the neural activity of a set of _Drosophila_ neurons, which can be addressed via their [Flywire](https://flywire.ai/) ID.
+The output of the model is the spike times and rates of all affected neurons.
+
+Two types of manipulations are currently implemented:
+- *Activation*:
+Neurons can be activated at a fixed frequency to model optogenetic activation.
+This triggers Poisson spiking in the target neurons. 
+Two sets of neurons with distinct frequencies can be defined.
+- *Silencing*:
+In addition to activation, a different set of neurons can be silenced to model optogenetic silencing.
+This sets all synaptic connections to and from those neurons to zero.
+
+See [example.ipynb](example.ipynb) for a detailed explanation on how to run the model.
+
+# Installation
+## Quick start 
+Install via [Anaconda](https://www.anaconda.com/):
+```bash
+conda create -f conda_env.yml
+```
+Run via notebooks as shown in [example.ipynb](example.ipynb) and [figures.ipynb](figures.ipynb).
+
+## Manual installation
+The model is written in python built using the *Brian 2* simulator.
+See the official [Brian 2 documentation](https://brian2.readthedocs.io/en/stable/introduction/install.html) for detailed installation instructions.
+
+Other dependencies are the python packages.
+(see [conda_env_full.yml](conda_env_full.yml) for specefic package versions):
+```
+brian2
+joblib
+pandas
+pyarrow
+```
+
