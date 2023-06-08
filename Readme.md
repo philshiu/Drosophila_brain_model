@@ -27,7 +27,9 @@ Two sets of neurons with distinct frequencies can be defined.
 In addition to activation, a different set of neurons can be silenced to model optogenetic silencing.
 This sets all synaptic connections to and from those neurons to zero.
 
-See [example.ipynb](example.ipynb) for a detailed explanation on how to run the model.
+See [example.ipynb](example.ipynb) for a tutorial and a more detailed explanation
+The actual model resides in [model.py](model.py).
+Some helper functions are provided by [utils.py](utils.py).
 
 # Installation
 ## Quick start 
@@ -35,14 +37,14 @@ Install via [Anaconda](https://www.anaconda.com/):
 ```bash
 conda create -f conda_env.yml
 ```
-Run via notebooks as shown in [example.ipynb](example.ipynb) and [figures.ipynb](figures.ipynb).
+Run using jupyter notebooks as shown in [example.ipynb](example.ipynb) and [figures.ipynb](figures.ipynb).
 
 ## Manual installation
 The model is written in python built using the *Brian 2* simulator.
 See the official [Brian 2 documentation](https://brian2.readthedocs.io/en/stable/introduction/install.html) for detailed installation instructions.
 
 Other dependencies are the python packages.
-(see [conda_env_full.yml](conda_env_full.yml) for specefic package versions):
+(see [conda_env_full.yml](conda_env_full.yml) for specific package versions):
 ```
 brian2
 joblib
