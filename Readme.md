@@ -6,7 +6,7 @@ fruit fly connectome
 This repository accompanies the paper 
 [A leaky integrate-and-fire computational model based on the connectome of the entire adult Drosophila brain reveals insights into sensorimotor processing](https://www.biorxiv.org/content/10.1101/2023.05.02.539144v1).
 It includes all code necessary to reproduce the data presented there.
-[figures.ipynb](figures.ipynb) contains the code used to perfrom the calculations.
+[figures.ipynb](figures.ipynb) contains the code used to perform the calculations.
 However, the raw output of the model is several GB and therefore not posted on github.
 Instead, it can be found in this [online archive](TODO).
 
