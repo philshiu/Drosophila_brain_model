@@ -8,7 +8,7 @@ This repository accompanies the paper
 It includes all code necessary to reproduce the data presented there.
 [figures.ipynb](figures.ipynb) contains the code used to perfrom the calculations.
 However, the raw output of the model is several GB and therefore not posted on github.
-Instead, it can be found in this [online archive](TODO).
+Instead, it can be found in this [online archive](https://doi.org/10.17617/3.CZODIW).
 
 
 
