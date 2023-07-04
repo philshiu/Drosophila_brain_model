@@ -35,7 +35,7 @@ Some helper functions are provided by [utils.py](utils.py).
 ## Quick start 
 Install via [Anaconda](https://www.anaconda.com/):
 ```bash
-conda create -f conda_env.yml
+conda env create -f conda_env.yml
 ```
 Run using jupyter notebooks as shown in [example.ipynb](example.ipynb) and [figures.ipynb](figures.ipynb).
 
