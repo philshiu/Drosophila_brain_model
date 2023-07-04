@@ -9,3 +9,4 @@ dependencies:
   - pandas
   - joblib
   - pyarrow
+  - openblas
