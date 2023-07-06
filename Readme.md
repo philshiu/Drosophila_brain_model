@@ -11,8 +11,6 @@ However, the raw output of the model is several GB and therefore not posted on g
 Instead, it can be found in this [online archive](https://doi.org/10.17617/3.CZODIW).
 
 
-
-
 # Usage
 With this computational model,
 one can manipulate the neural activity of a set of _Drosophila_ neurons, which can be addressed via their [Flywire](https://flywire.ai/) ID.
@@ -32,23 +30,19 @@ The actual model resides in [model.py](model.py).
 Some helper functions are provided by [utils.py](utils.py).
 
 # Installation
-## Quick start 
-Install via [Anaconda](https://www.anaconda.com/):
+## via conda
+Install in a [Anaconda](https://www.anaconda.com/) environment:
 ```bash
-conda env create -f conda_env.yml
+conda env create -f environment.yml
 ```
 Run using jupyter notebooks as shown in [example.ipynb](example.ipynb) and [figures.ipynb](figures.ipynb).
 
-## Manual installation
+Note that this may install *Brian 2* with limited performance (see below).
+
+## Brian 2 performance
 The model is written in python built using the *Brian 2* simulator.
-See the official [Brian 2 documentation](https://brian2.readthedocs.io/en/stable/introduction/install.html) for detailed installation instructions.
+See the official [Brian 2 documentation](https://brian2.readthedocs.io/en/stable/introduction/install.html) for detailed installation instructions for you system.
+Specifically, follow the instructions for [C++ code generation](https://brian2.readthedocs.io/en/stable/introduction/install.html#requirements-for-c-code-generation) to install *Brian 2* with increased performance.
 
-Other dependencies are the python packages.
-(see [conda_env_full.yml](conda_env_full.yml) for specific package versions):
-```
-brian2
-joblib
-pandas
-pyarrow
-```
-
+## dependencies
+See [environment_full.yml](environment_full.yml) for specific package versions used in the original work.
