@@ -1,3 +1,5 @@
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/philshiu/Drosophila_brain_model/blob/main/Example_Google_Colab.ipynb)
+
 # Model for the _Drosophila_ brain
 Activate and silence neurons in a computational model based on the
 fruit fly connectome
@@ -31,7 +33,7 @@ Some helper functions are provided by [utils.py](utils.py).
 
 # Installation
 ## Quick Start
-To begin using the model without a local install, follow this Google Colab [link](https://colab.research.google.com/github/philshiu/Drosophila_brain_model/blob/main/Example_Google_Colab.ipynb). Note that simulations can take substantially longer to run on Google Colab than on a local installation, depending on the number of CPU cores you have access to.
+To begin using the model without a local install, click on the _Open In Colab_ badge at the top of this README. Note that simulations can take substantially longer to run on Google Colab than on a local installation, depending on the number of CPU cores you have access to.
 ## via conda
 Install in a [Anaconda](https://www.anaconda.com/) environment:
 ```bash
