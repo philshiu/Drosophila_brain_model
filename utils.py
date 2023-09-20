@@ -29,7 +29,7 @@ def load_exps(l_pqt):
 
     return df
 
-def get_rate(df, duration, flyid2name=dict()):
+def get_rate(df, t_trl, n_trl, flyid2name=dict()):
     '''Calculate rate and standard deviation for all experiments
     in df
 
@@ -37,8 +37,10 @@ def get_rate(df, duration, flyid2name=dict()):
     ----------
     df : pd.DataFrame
         Dataframe generated with `load_exps` containing spike times
-    duration : float
+    t_trl : float
         Trial duration in seconds
+    n_trl : int
+        Number of trials
     flyid2name : dict (optional)
         Mapping between flywire IDs and custom names
 
@@ -55,10 +57,9 @@ def get_rate(df, duration, flyid2name=dict()):
     for e, df_e in df.groupby('exp_name', sort=False):
         for f, df_f in df_e.groupby('flywire_id'):
 
-            r = []
-            for _, df_t in df_f.groupby('trial'):
-                r.append(len(df_t) / duration)
-            r = np.array(r)
+            r = np.zeros(n_trl)
+            for t, df_t in df_f.groupby('trial'):
+                r[int(t)] = len(df_t) / t_trl
 
             rate.append(r.mean())
             std.append(r.std())
