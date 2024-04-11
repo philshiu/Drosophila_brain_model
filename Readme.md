@@ -32,6 +32,7 @@ The actual model resides in [model.py](model.py).
 Some helper functions are provided by [utils.py](utils.py).
 
 # Installation
+The Drosophila brain model can be run on Mac, Windows or Unix, and installation should take 10 minutes.
 ## Quick Start
 To begin using the model without a local install, click on the _Open In Colab_ badge at the top of this README. Note that simulations can take substantially longer to run on Google Colab than on a local installation, depending on the number of CPU cores you have access to.
 ## via conda
