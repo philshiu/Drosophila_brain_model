@@ -51,3 +51,11 @@ Specifically, follow the instructions for [C++ code generation](https://brian2.r
 
 ## dependencies
 See [environment_full.yml](environment_full.yml) for specific package versions used in the original work.
+## Version 783
+The code is currently set up for the Flywire version 630, which the paper used. To use public version 783, change the config dictionary:
+config = {
+    'path_res'  : './results/new',                 # directory to store results
+    'path_comp' : './Completeness_783.csv',        # csv of the complete list of Flywire neurons
+    'path_con'  : './Connectivity_783.parquet',    # connectivity data
+    'n_proc'    : -1,                              # number of CPU cores (-1: use all)
+}
